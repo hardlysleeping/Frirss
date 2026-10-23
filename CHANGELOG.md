@@ -6,6 +6,57 @@ release live on its [release page](https://github.com/Fripix/Frirss/releases).
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 FriRSS follows [semantic versioning](https://semver.org/).
 
+## [1.6.1-ext1] - 2026-10-23
+
+Première version de ce fork à piloter les extensions de catégories depuis
+l'interface. Les extensions ne sont pas modifiées : FriRSS leur envoie
+l'intention par la passerelle `xExtension-HardlyRead`, qui appelle leur propre
+code, puis adopte l'état renvoyé.
+
+## Fonctionnalités
+
+- **Œil des catégories masquées, dans la barre latérale.** Un bouton global fait
+  défiler *masquées → révélées → seulement* : [Hidden
+  Categories](https://github.com/hardlysleeping/xExtension-HiddenCategories)
+  garde la main sur son état, y compris le balayage des priorités de flux en mode
+  Strict. Chaque catégorie a son propre œil pour la masquer ou la rétablir, une
+  catégorie révélée mais masquée porte une étiquette `HIDDEN`, et le bouton
+  global reste atteignable là où une catégorie entièrement masquée n'a plus de
+  rangée à cliquer. Verrouillée, l'extension affiche un cadenas et le bouton est
+  désactivé : le déverrouillage demande le code, que seule la page de
+  l'extension réclame.
+- **Épingle des catégories, dans la barre latérale.** Un bouton global fait
+  défiler *toutes → épinglées → sans les épinglées*, chaque catégorie s'épingle
+  ou se désépingle seule, et les catégories épinglées remontent en tête avec une
+  épingle pleine. L'état vient de [Pinned
+  Categories](https://github.com/hardlysleeping/xExtension-FavoriteCategories),
+  FriRSS ne tient aucune liste locale.
+- **Synchronisation après coup, pas après un délai.** L'écriture ne rend la main
+  qu'une fois le balayage Strict terminé côté PHP : FriRSS attend la réponse
+  HTTP, relit les abonnements, puis la vue et les compteurs courants — jamais
+  `refresh()`, qui lancerait une collecte de flux inutile. Une réponse plus
+  ancienne qu'un clic plus récent est ignorée, pour qu'un aller-retour lent ne
+  réécrive pas un cran déjà dépassé.
+- **Light et Strict traités différemment.** En Strict le serveur a déjà changé
+  les priorités : rouvrir les abonnements suffit, et la barre latérale n'est pas
+  filtrée une seconde fois. En Light l'API ne voit aucune différence, donc
+  FriRSS applique les identifiants renvoyés à sa propre barre latérale et à sa
+  liste d'articles.
+- Interface traduite dans les dix langues du projet ; nouvelle section dans
+  `docs/FEATURES.md` et dans le README.
+
+## Corrections et améliorations
+
+- **Les écritures JSON traversent enfin le proxy.** `express.json()` analysait
+  déjà le corps, si bien que le test `req.body.length` le prenait pour vide :
+  chaque écriture partait en amont sans corps et l'extension répondait
+  `invalid_view` à un PUT pourtant correct. Les corps JSON sont désormais
+  resérialisés, les corps bruts inchangés.
+- **Un état partiel n'efface plus l'autre extension.** La réponse d'une écriture
+  ne porte que l'extension modifiée ; l'adopter comme un instantané complet
+  faisait disparaître les boutons de l'épingle après un clic sur l'œil.
+  L'adoption se fait maintenant clé par clé.
+
 ## [1.6.0] - 2026-10-14
 
 ## Fonctionnalités

@@ -3,6 +3,8 @@
   <h1>FriRSS</h1>
   <p><em>Your FriRSS, your rules.</em></p>
   <p>A self-hosted, customizable web frontend for <a href="https://freshrss.org">FreshRSS</a>.</p>
+  <p><sub>Fork of <a href="https://github.com/Fripix/Frirss">Fripix/Frirss</a> that drives the
+  category extensions from the sidebar — see <a href="#category-extensions">Category extensions</a>.</sub></p>
 
   <p>
     <img src="https://flagcdn.com/24x18/fr.png" alt="Français" />&nbsp;
@@ -105,6 +107,29 @@ Almost everything is yours to tweak:
 - **Labels & sub-labels** — a nestable tagging system: create, rename, color, drag to organize, group under parents, with per-label article counts.
 - **Branding** — set your own app name and logo.
 - **10 languages** — the interface follows your browser language on first run.
+
+### Category extensions
+
+This fork adds two controls to the sidebar for the FreshRSS category extensions maintained
+alongside it — their state stays theirs, FriRSS only offers the button:
+
+- **[Hidden Categories](https://github.com/hardlysleeping/xExtension-HiddenCategories)** — the eye in the sidebar toolbar cycles *hidden → revealed → only*, and each category gets its own eye to hide or restore it. A revealed category that is hidden carries a `HIDDEN` tag. When the extension is locked the eye becomes a lock and stays disabled: unlocking needs the passcode, which only the extension's own page asks for.
+- **[Favorite Categories](https://github.com/hardlysleeping/xExtension-FavoriteCategories)** — the pin cycles *all → only pinned → without pinned*, and each category can be pinned or unpinned on its own. Pinned categories sort to the top of the sidebar and keep a filled pin.
+
+Neither extension is modified to make this work. FriRSS asks a small bridge extension
+(xExtension-HardlyRead) for the state and for the action; the bridge calls the category
+extension's own code, which keeps owning its view and, in **Strict** mode, the feed priority
+writes it does. The client waits for that call to come back before it reloads subscriptions and
+the current view, so what you see is what the server actually did — no timer, no polling, no
+page reload.
+
+In **Light** mode the extensions only filter FreshRSS's own interface, and the API sees no
+difference, so FriRSS applies the returned hidden and pinned categories to its own sidebar and
+article list. In **Strict** mode the server has already changed what each feed belongs to, so
+FriRSS simply re-reads the subscriptions.
+
+Both extensions and the bridge have to be installed on the FreshRSS instance for the buttons to
+appear. Without them nothing is drawn and the rest of the UI is unchanged.
 
 ### Accounts, SSO & multi-server
 - **Multi-user** with admin/user roles — each person keeps their own feeds and settings.
