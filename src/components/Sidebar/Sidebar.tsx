@@ -20,6 +20,9 @@ import {
 } from '../../lib/savedCategories';
 import FeedFavicon from '../FeedFavicon';
 import { resolveVersionLabel } from '../../lib/version';
+import { useExtensionStore, categoryVisibilityOf } from '../../stores/extensionStore';
+import { applyCategoryVisibility, isCategoryHidden, isCategoryPinned } from '../../lib/extensionCategories';
+import { EyeIcon, LockIcon, PinIcon } from './extensionIcons';
 
 const SIDEBAR_FONT_MIN = 11;
 const SIDEBAR_FONT_MAX = 18;
@@ -74,6 +77,23 @@ export default function Sidebar() {
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
   const breakpoint = useBreakpoint();
   const isMobile = breakpoint === 'mobile';
+
+  // Extensions FreshRSS : l'œil (Hidden Categories) et l'épingle (Favorite
+  // Categories). Ces boutons n'existent que si le serveur expose la passerelle ;
+  // sinon `hidden`/`favorites` restent nuls et rien n'est dessiné.
+  const hiddenExt = useExtensionStore((s) => s.hidden);
+  const favoritesExt = useExtensionStore((s) => s.favorites);
+  const pendingHidden = useExtensionStore((s) => s.pendingHidden);
+  const pendingFavorites = useExtensionStore((s) => s.pendingFavorites);
+  const cycleHidden = useExtensionStore((s) => s.cycleHidden);
+  const cycleFavorites = useExtensionStore((s) => s.cycleFavorites);
+  const toggleCategoryHidden = useExtensionStore((s) => s.toggleCategoryHidden);
+  const toggleCategoryFavorite = useExtensionStore((s) => s.toggleCategoryFavorite);
+  const extensionView = useMemo(
+    () => categoryVisibilityOf(hiddenExt, favoritesExt),
+    [hiddenExt, favoritesExt],
+  );
+
   const setLayoutMode = useUiStore((s) => s.setLayoutMode);
   const appTitle = useUiStore((s) => s.appTitle);
   const appLogo = useUiStore((s) => s.appLogo);
@@ -141,16 +161,25 @@ export default function Sidebar() {
   // When "hide read feeds" is on, drop feeds with no unread — and categories
   // left empty — but always keep the feed you're currently viewing. Disabled
   // in organize mode so every feed stays draggable.
+  //
+  // Avant cela, les extensions de catégories font leur travail : elles peuvent
+  // retirer des catégories entières (masquage en Light, vue « épinglées seules »)
+  // et remonter les épinglées en tête. En Strict, le serveur a déjà retiré les
+  // flux concernés, donc `applyCategoryVisibility` n'y masque rien : il ne fait
+  // que l'épinglage et l'ordre.
   const displayCategories = useMemo(() => {
-    if (!hideReadFeeds || organizeMode) return categories;
+    const filtered = extensionView.active
+      ? applyCategoryVisibility(categories, extensionView).visible
+      : categories;
+    if (!hideReadFeeds || organizeMode) return filtered;
     const keepId = selectedFeed?.id;
-    return categories
+    return filtered
       .map((cat) => ({
         ...cat,
         feeds: cat.feeds.filter((f) => (unreadCounts[f.id] || 0) > 0 || f.id === keepId),
       }))
       .filter((cat) => cat.feeds.length > 0);
-  }, [categories, hideReadFeeds, organizeMode, unreadCounts, selectedFeed]);
+  }, [categories, hideReadFeeds, organizeMode, unreadCounts, selectedFeed, extensionView]);
 
   // Only the feeds the home view shows: a feed FreshRSS keeps in its category
   // must not swell a badge the list cannot honour.
@@ -408,6 +437,39 @@ export default function Sidebar() {
             {t('sidebar.addFeed')}
           </span>
         )}
+
+        {/* Extensions de catégories : l'œil et l'épingle, en tête de barre pour
+            rester atteignables même en Strict, où une catégorie entièrement
+            masquée n'a plus de rangée à cliquer. */}
+        {extensionView.hiddenAvailable && (
+          <button
+            onClick={cycleHidden}
+            disabled={pendingHidden || extensionView.locked}
+            className={`flex-shrink-0 rounded transition-colors hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed ${isMobile ? 'p-2' : 'p-1.5'}`}
+            style={{ color: extensionView.hiddenView === 'hidden' ? 'var(--sidebar-text)' : 'var(--accent)' }}
+            title={t(`extension.eye.${extensionView.hiddenView}`)}
+            aria-label={t(`extension.eye.${extensionView.hiddenView}`)}
+            aria-pressed={extensionView.hiddenView !== 'hidden'}
+          >
+            {extensionView.locked
+              ? <LockIcon className={isMobile ? 'w-5 h-5' : 'w-3.5 h-3.5'} />
+              : <EyeIcon view={extensionView.hiddenView} className={isMobile ? 'w-5 h-5' : 'w-3.5 h-3.5'} />}
+          </button>
+        )}
+        {extensionView.favoritesAvailable && (
+          <button
+            onClick={cycleFavorites}
+            disabled={pendingFavorites}
+            className={`flex-shrink-0 rounded transition-colors hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed ${isMobile ? 'p-2' : 'p-1.5'}`}
+            style={{ color: extensionView.favoritesView === 'all' ? 'var(--sidebar-text)' : 'var(--accent)' }}
+            title={t(`extension.pin.${extensionView.favoritesView}`)}
+            aria-label={t(`extension.pin.${extensionView.favoritesView}`)}
+            aria-pressed={extensionView.favoritesView !== 'all'}
+          >
+            <PinIcon filled={extensionView.favoritesView !== 'all'} className={isMobile ? 'w-5 h-5' : 'w-3.5 h-3.5'} />
+          </button>
+        )}
+
         <div className="flex-1" />
         <button
           onClick={() => setAddFeedOpen(true)}
@@ -517,10 +579,15 @@ export default function Sidebar() {
           const catUnread = cat.feeds.reduce(
             (sum, f) => sum + (unreadCounts[f.id] || 0), 0
           );
+          const pinned = isCategoryPinned(cat.id, extensionView);
+          const hiddenCat = isCategoryHidden(cat.id, extensionView);
+          // `categoryMasked` couvre aussi la vue normale, où la catégorie n'est
+          // pas affichée mais où l'œil doit quand même refléter son état.
+          const categoryMasked = extensionView.allHiddenLabels.has(cat.id);
           return (
             <div
               key={cat.id}
-              className="mb-3"
+              className="mb-3 group/cat"
               draggable={organizeMode}
               onDragStart={organizeMode ? (e) => handleCatDragStart(e, cat.id) : undefined}
               onDragOver={organizeMode ? handleCatDragOver : undefined}
@@ -563,10 +630,67 @@ export default function Sidebar() {
                 {/* Name: opens the aggregated "all articles in this category" view. */}
                 <button
                   onClick={organizeMode ? undefined : () => selectCategory({ id: cat.id, label: cat.label })}
-                  className="truncate flex-1 text-left uppercase tracking-widest"
+                  className={`truncate flex-1 text-left uppercase tracking-widest ${hiddenCat ? 'opacity-50' : ''}`}
                 >
                   {cat.label}
                 </button>
+
+                {/* Étiquette « masquée » : visible quand la catégorie est dans la
+                    liste alors que le rideau la couvre (vue entrevue / masqués
+                    seuls). En vue normale elle n'est simplement pas là. */}
+                {hiddenCat && (
+                  <span
+                    className="flex-shrink-0 px-1.5 py-px rounded text-[9px] font-semibold uppercase tracking-wider border"
+                    style={{
+                      color: 'var(--sidebar-category-text)',
+                      borderColor: 'var(--sidebar-divider)',
+                      opacity: 0.75,
+                    }}
+                  >
+                    {t('extension.hiddenTag')}
+                  </span>
+                )}
+
+                {/* Œil de la catégorie : masquer / rétablir, sans quitter la
+                    barre latérale. Désactivé sous verrou — le rideau ne se
+                    contourne pas depuis une rangée. */}
+                {extensionView.hiddenAvailable && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); void toggleCategoryHidden(cat.id); }}
+                    disabled={pendingHidden || extensionView.locked}
+                    className={`flex-shrink-0 -my-1 py-1 transition-opacity hover:opacity-100 disabled:cursor-not-allowed ${
+                      categoryMasked
+                        ? 'opacity-70'
+                        : isMobile ? 'opacity-50' : 'opacity-0 group-hover/cat:opacity-60'
+                    }`}
+                    style={{ color: categoryMasked ? 'var(--accent)' : 'var(--sidebar-text)' }}
+                    title={categoryMasked ? t('extension.unhideCategory') : t('extension.hideCategory')}
+                    aria-label={categoryMasked ? t('extension.unhideCategory') : t('extension.hideCategory')}
+                    aria-pressed={categoryMasked}
+                  >
+                    <EyeIcon view={categoryMasked ? 'hidden' : 'revealed'} className="w-3 h-3" />
+                  </button>
+                )}
+
+                {/* Épingle : c'est elle qui range la catégorie en tête de liste
+                    (« épinglées » de Favorite Categories). Pleine et colorée
+                    quand elle est posée, discrète sinon. */}
+                {extensionView.favoritesAvailable && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); void toggleCategoryFavorite(cat.id); }}
+                    disabled={pendingFavorites}
+                    className={`flex-shrink-0 -my-1 py-1 transition-opacity hover:opacity-100 ${
+                      pinned ? 'opacity-100' : isMobile ? 'opacity-50' : 'opacity-0 group-hover/cat:opacity-50'
+                    }`}
+                    style={{ color: pinned ? 'var(--accent)' : 'var(--sidebar-text)' }}
+                    title={pinned ? t('extension.unpinCategory') : t('extension.pinCategory')}
+                    aria-label={pinned ? t('extension.unpinCategory') : t('extension.pinCategory')}
+                    aria-pressed={pinned}
+                  >
+                    <PinIcon filled={pinned} className="w-3 h-3" />
+                  </button>
+                )}
+
                 {catUnread > 0 && (
                   <CategoryBadge count={catUnread} />
                 )}

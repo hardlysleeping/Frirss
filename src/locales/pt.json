@@ -718,5 +718,25 @@
     "markAllConfirm": "Marcar como lido",
     "markAboveTitle": "Marcar como lidos os artigos acima?",
     "markBelowTitle": "Marcar como lidos os artigos abaixo?"
+  },
+  "extension": {
+    "eye": {
+      "hidden": "Categorias ocultas — clique para espreitar",
+      "revealed": "As categorias ocultas estão visíveis — clique para mostrar apenas essas",
+      "only": "Só as categorias ocultas são mostradas — clique para as ocultar de novo"
+    },
+    "pin": {
+      "all": "Todas as categorias — clique para manter apenas as fixadas",
+      "only": "Só as categorias fixadas são mostradas — clique para as remover",
+      "without": "As categorias fixadas foram removidas — clique para mostrar tudo"
+    },
+    "hiddenTag": "Oculta",
+    "hideCategory": "Ocultar esta categoria",
+    "unhideCategory": "Restaurar esta categoria",
+    "pinCategory": "Fixar esta categoria no topo",
+    "unpinCategory": "Desafixar esta categoria",
+    "locked": "Bloqueado: desbloqueie nas definições do FreshRSS",
+    "failed": "A alteração não foi aplicada",
+    "convergenceFailed": "Vista guardada, mas nem todos os feeds seguiram"
   }
 }

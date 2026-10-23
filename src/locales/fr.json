@@ -718,5 +718,25 @@
     "markAllConfirm": "Marquer lu",
     "markAboveTitle": "Marquer comme lus les articles au-dessus ?",
     "markBelowTitle": "Marquer comme lus les articles en dessous ?"
+  },
+  "extension": {
+    "eye": {
+      "hidden": "Catégories masquées — cliquer pour les entrevoir",
+      "revealed": "Catégories masquées visibles — cliquer pour ne montrer qu'elles",
+      "only": "Seules les catégories masquées sont affichées — cliquer pour tout remasquer"
+    },
+    "pin": {
+      "all": "Toutes les catégories — cliquer pour ne garder que les épinglées",
+      "only": "Seules les épinglées sont affichées — cliquer pour les retirer",
+      "without": "Les épinglées sont retirées — cliquer pour tout réafficher"
+    },
+    "hiddenTag": "Masquée",
+    "hideCategory": "Masquer cette catégorie",
+    "unhideCategory": "Rétablir cette catégorie",
+    "pinCategory": "Épingler cette catégorie en tête",
+    "unpinCategory": "Détacher cette catégorie",
+    "locked": "Verrouillé : à déverrouiller dans les réglages de FreshRSS",
+    "failed": "Le changement n'a pas abouti",
+    "convergenceFailed": "Vue enregistrée, mais les flux n'ont pas tous suivi"
   }
 }

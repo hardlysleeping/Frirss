@@ -746,5 +746,25 @@
     "markAllConfirm": "Oznacz jako przeczytane",
     "markAboveTitle": "Oznaczyć artykuły powyżej jako przeczytane?",
     "markBelowTitle": "Oznaczyć artykuły poniżej jako przeczytane?"
+  },
+  "extension": {
+    "eye": {
+      "hidden": "Ukryte kategorie — kliknij, aby podejrzeć",
+      "revealed": "Ukryte kategorie są widoczne — kliknij, aby pokazać tylko je",
+      "only": "Pokazywane są tylko ukryte kategorie — kliknij, aby je ponownie ukryć"
+    },
+    "pin": {
+      "all": "Wszystkie kategorie — kliknij, aby zostawić tylko przypięte",
+      "only": "Pokazywane są tylko przypięte kategorie — kliknij, aby je usunąć",
+      "without": "Przypięte kategorie są usunięte — kliknij, aby pokazać wszystko"
+    },
+    "hiddenTag": "Ukryta",
+    "hideCategory": "Ukryj tę kategorię",
+    "unhideCategory": "Przywróć tę kategorię",
+    "pinCategory": "Przypnij tę kategorię na górze",
+    "unpinCategory": "Odepnij tę kategorię",
+    "locked": "Zablokowane: odblokuj w ustawieniach FreshRSS",
+    "failed": "Zmiana nie została wprowadzona",
+    "convergenceFailed": "Widok zapisany, ale nie wszystkie kanały nadążyły"
   }
 }

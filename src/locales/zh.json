@@ -718,5 +718,25 @@
     "markAllConfirm": "标为已读",
     "markAboveTitle": "将上方的文章标为已读？",
     "markBelowTitle": "将下方的文章标为已读？"
+  },
+  "extension": {
+    "eye": {
+      "hidden": "已隐藏的分类 — 点击查看",
+      "revealed": "隐藏分类可见 — 点击仅显示这些",
+      "only": "仅显示隐藏分类 — 点击重新隐藏"
+    },
+    "pin": {
+      "all": "全部分类 — 点击仅保留置顶",
+      "only": "仅显示置顶分类 — 点击移除",
+      "without": "已移除置顶分类 — 点击显示全部"
+    },
+    "hiddenTag": "已隐藏",
+    "hideCategory": "隐藏此分类",
+    "unhideCategory": "恢复此分类",
+    "pinCategory": "置顶此分类",
+    "unpinCategory": "取消置顶此分类",
+    "locked": "已锁定：请在 FreshRSS 设置中解锁",
+    "failed": "更改未生效",
+    "convergenceFailed": "视图已保存，但并非所有订阅源都同步"
   }
 }

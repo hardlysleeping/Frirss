@@ -718,5 +718,25 @@
     "markAllConfirm": "Als gelezen markeren",
     "markAboveTitle": "De artikelen hierboven als gelezen markeren?",
     "markBelowTitle": "De artikelen hieronder als gelezen markeren?"
+  },
+  "extension": {
+    "eye": {
+      "hidden": "Verborgen categorie — klik om te gluren",
+      "revealed": "Verborgen categorie zijn zichtbaar — klik om alleen die te tonen",
+      "only": "Alleen verborgen categorieën worden getoond — klik om ze weer te verbergen"
+    },
+    "pin": {
+      "all": "Alle categorieën — klik om alleen vastgezette te houden",
+      "only": "Alleen vastgezette categorieën — klik om ze te verwijderen",
+      "without": "Vastgezette categorieën zijn verwijderd — klik om alles te tonen"
+    },
+    "hiddenTag": "Verborgen",
+    "hideCategory": "Deze categorie verbergen",
+    "unhideCategory": "Deze categorie herstellen",
+    "pinCategory": "Deze categorie bovenaan vastzetten",
+    "unpinCategory": "Deze categorie losmaken",
+    "locked": "Vergrendeld: ontgrendel in de FreshRSS-instellingen",
+    "failed": "De wijziging is niet doorgegaan",
+    "convergenceFailed": "Weergave opgeslagen, maar niet alle feeds volgden"
   }
 }

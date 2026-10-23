@@ -718,5 +718,25 @@
     "markAllConfirm": "Als gelesen markieren",
     "markAboveTitle": "Die Artikel darüber als gelesen markieren?",
     "markBelowTitle": "Die Artikel darunter als gelesen markieren?"
+  },
+  "extension": {
+    "eye": {
+      "hidden": "Versteckte Kategorien — klicken zum Anzeigen",
+      "revealed": "Versteckte Kategorien sind sichtbar — klicken, um nur sie zu zeigen",
+      "only": "Nur versteckte Kategorien — klicken, um sie wieder zu verstecken"
+    },
+    "pin": {
+      "all": "Alle Kategorien — klicken, um nur angeheftete zu behalten",
+      "only": "Nur angeheftete Kategorien — klicken, um sie zu entfernen",
+      "without": "Angeheftete Kategorien sind entfernt — klicken für alles"
+    },
+    "hiddenTag": "Versteckt",
+    "hideCategory": "Diese Kategorie verstecken",
+    "unhideCategory": "Diese Kategorie wiederherstellen",
+    "pinCategory": "Diese Kategorie oben anheften",
+    "unpinCategory": "Diese Kategorie lösen",
+    "locked": "Gesperrt: in den FreshRSS-Einstellungen entsperren",
+    "failed": "Die Änderung ist fehlgeschlagen",
+    "convergenceFailed": "Ansicht gespeichert, aber nicht alle Feeds folgten"
   }
 }

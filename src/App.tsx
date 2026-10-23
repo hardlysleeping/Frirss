@@ -4,6 +4,7 @@ import { getMe, getAuthStatus, getServers } from './api/backend';
 import { useFeedStore } from './stores/feedStore';
 import { useThemeStore } from './stores/themeStore';
 import { useUiStore, isUnreadOnly } from './stores/uiStore';
+import { useExtensionStore } from './stores/extensionStore';
 import { useKeyboardNav } from './hooks/useKeyboardNav';
 import { useBreakpoint } from './hooks/useBreakpoint';
 import { useAndroidBack } from './hooks/useAndroidBack';
@@ -192,8 +193,17 @@ export default function App() {
   const restoredViewRef = useRef(false);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      // Déconnexion : les deux états d'extension appartiennent à l'utilisateur
+      // qui part, ils ne doivent pas suivre le suivant.
+      useExtensionStore.getState().reset();
+      return;
+    }
     loadSubscriptions();
+    // État de l'œil et de l'épingle : une lecture, au même moment que les
+    // abonnements. Si la passerelle n'est pas là, le magasin reste vide et les
+    // boutons ne s'affichent pas — ce n'est pas une erreur de FriRSS.
+    void useExtensionStore.getState().load();
     // Open on the view the user asked for: the last one left on this server
     // (historical default), or always a home entry (discussion #19). A chosen
     // view counts as "restored" so the unread-scope reconcile below leaves it.

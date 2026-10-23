@@ -718,5 +718,25 @@
     "markAllConfirm": "Segna come letto",
     "markAboveTitle": "Segnare come letti gli articoli sopra?",
     "markBelowTitle": "Segnare come letti gli articoli sotto?"
+  },
+  "extension": {
+    "eye": {
+      "hidden": "Categorie nascoste: clicca per sbirciare",
+      "revealed": "Le categorie nascoste sono visibili: clicca per mostrare solo quelle",
+      "only": "Sono mostrate solo le categorie nascoste: clicca per nasconderle di nuovo"
+    },
+    "pin": {
+      "all": "Tutte le categorie: clicca per tenere solo quelle fissate",
+      "only": "Sono mostrate solo le fissate: clicca per rimuoverle",
+      "without": "Le fissate sono rimosse: clicca per mostrare tutto"
+    },
+    "hiddenTag": "Nascosta",
+    "hideCategory": "Nascondi questa categoria",
+    "unhideCategory": "Ripristina questa categoria",
+    "pinCategory": "Fissa questa categoria in alto",
+    "unpinCategory": "Rimuovi il fissaggio",
+    "locked": "Bloccato: sbloccalo nelle impostazioni di FreshRSS",
+    "failed": "La modifica non è andata a buon fine",
+    "convergenceFailed": "Vista salvata, ma non tutti i feed hanno seguito"
   }
 }

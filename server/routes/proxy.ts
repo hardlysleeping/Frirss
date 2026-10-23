@@ -605,7 +605,18 @@ router.all('/', async (req, res) => {
     } catch { /* target already validated above; ignore */ }
   }
   const ct = req.header('content-type');
-  const hasBody = req.method !== 'GET' && req.method !== 'HEAD' && req.body && req.body.length;
+  // `express.json()` a déjà analysé les corps JSON : `req.body` est alors un
+  // objet, sans `.length` — l'ancien test le prenait pour un corps vide et
+  // l'écriture partait en amont SANS corps (l'extension répondait alors
+  // `invalid_view` à un PUT pourtant correct). On sérialise ce cas au lieu de
+  // le jeter ; les corps Buffer/chaîne gardent leur traitement d'origine.
+  const body =
+    req.method === 'GET' || req.method === 'HEAD' || req.body == null
+      ? undefined
+      : Buffer.isBuffer(req.body) || typeof req.body === 'string'
+        ? (req.body.length ? req.body : undefined)
+        : JSON.stringify(req.body);
+  const hasBody = body !== undefined;
   if (hasBody && ct) headers['Content-Type'] = ct;
 
   const cacheable = cacheEnabled && isCacheableRead(req.method, rawTarget);
@@ -640,7 +651,7 @@ router.all('/', async (req, res) => {
     upstream = await fetchUpstream(rawTarget, {
       method: req.method,
       headers,
-      body: hasBody ? req.body : undefined,
+      body: hasBody ? body : undefined,
     });
   } catch (err) {
     return finishError(res, err, rawTarget);

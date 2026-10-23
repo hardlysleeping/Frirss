@@ -3208,10 +3208,61 @@ n'existe pas.
 
 ---
 
+## Extensions de catégories (FreshRSS)
+
+FriRSS expose l'œil de **Hidden Categories** et l'épingle de **Favorite
+Categories** directement dans la barre latérale : deux boutons dans la barre
+d'outils (cycle global) et deux boutons par rangée de catégorie.
+
+- **Où** : `src/api/extensions.ts` (transport), `src/lib/extensionCategories.ts`
+  (mapping et filtrage, pur), `src/stores/extensionStore.ts` (état, séquence,
+  synchronisation), `src/components/Sidebar/Sidebar.tsx` (boutons).
+- **Qui possède l'état** : les extensions PHP, jamais FriRSS. FriRSS n'écrit
+  jamais `priority` et ne rejoue pas le cycle du masquage : il appelle la
+  passerelle `xExtension-HardlyRead` (`/api/misc.php/Hardly%20Read/v1/…`), qui
+  authentifie avec le même identifiant Google Reader et délègue à l'extension
+  propriétaire. Le proxy existant (`/api/proxy`) injecte déjà l'en-tête
+  `GoogleLogin` pour toute cible sous l'URL du serveur configuré : aucune route
+  serveur nouvelle n'est nécessaire.
+- **Pas d'attente arbitraire** : l'écriture PHP ne rend la main qu'une fois le
+  balayage Strict terminé. « Attendre la fin » = attendre la réponse HTTP. Pas
+  de sondage, pas de délai, pas de rechargement de page, et surtout pas
+  `refresh()` — qui déclencherait une collecte de flux inutile.
+- **Light vs Strict** : en Strict, FreshRSS retire les flux masqués de
+  `subscription/list` et FriRSS n'a rien à filtrer — il relit les abonnements.
+  En Light, l'extension ne filtre que l'interface FreshRSS : FriRSS applique
+  donc lui-même le filtre (`isCategoryVisible`) à partir des identifiants
+  renvoyés. ⚠️ Filtrer en Strict masquerait une catégorie que FreshRSS montre.
+- ⚠️ **En Strict, une catégorie entièrement masquée n'a plus de rangée.** Ses
+  flux ne remontent pas, donc elle n'existe plus dans la liste : seul le bouton
+  global de la barre d'outils peut la faire revenir. C'est pour cela que l'œil
+  global existe en plus du bouton par catégorie.
+- **Épinglage** = `favorites` de Favorite Categories : les épinglées remontent en
+  tête de liste (`applyCategoryVisibility`), sans retrie r le reste.
+- **Étiquette « masquée »** : visible uniquement quand la catégorie est affichée
+  alors que le rideau la couvre (vue « entrevu » ou « masqués seuls »).
+- **Le rideau prime sur l'épingle** : une catégorie masquée le reste même si
+  elle est épinglée. Le verrou prime sur l'œil : `effectiveView` est utilisé,
+  jamais la préférence stockée.
+- ⚠️ **La jointure se fait sur le NOM.** GReader n'expose que
+  `user/-/label/<nom>`, la passerelle parle identifiants numériques. Un
+  renommage de catégorie casse le lien jusqu'au prochain `/v1/state`.
+- **Réponses périmées** : un compteur de séquence dans le magasin fait que seule
+  la réponse la plus récente écrit l'état et lance la synchronisation. Deux clics
+  rapides ne peuvent donc pas laisser la barre latérale sur un cran dépassé.
+- **Verrou** : la passerelle répond `423` avec l'état ; FriRSS affiche un cadenas
+  et n'offre pas encore de saisie de code — le déverrouillage se fait dans
+  FreshRSS.
+- **Pas de passerelle, pas de boutons** : extension absente ou désactivée →
+  `available: false`, le magasin reste vide et rien n'est dessiné. Ce n'est pas
+  une erreur, c'est une fonctionnalité du serveur qui n'est pas là.
+
+---
+
 ## Internationalisation
 
 **10 locales** : `fr` (repli), `en`, `de`, `es`, `it`, `nl`, `pl`, `pt`, `uk`,
-`zh`. 586 clés. i18next v26 : pluriels `_one`/`_other`, plus `_few`/`_many` pour
+`zh`. 650 clés. i18next v26 : pluriels `_one`/`_other`, plus `_few`/`_many` pour
 `pl` et `uk`.
 
 Le chinois simplifié est arrivé par contribution externe (PR #12, zhhbinn,
@@ -3352,7 +3403,7 @@ Chaque famille correspond à une zone de l'interface :
 `app` · `sidebar` · `addFeed` · `articleList` · `articleRow` · `swipe` ·
 `emptyState` · `readingPane` · `preferences` · `login` · `admin` · `servers` ·
 `dates` · `time` · `shortcutBar` · `viewMode` · `connection` · `update` ·
-`refresh` · `saved` · `backup` · `toast` · `palette`
+`refresh` · `saved` · `backup` · `toast` · `palette` · `extension`
 
 ---
 

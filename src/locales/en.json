@@ -718,5 +718,25 @@
     "markAllConfirm": "Mark as read",
     "markAboveTitle": "Mark the articles above as read?",
     "markBelowTitle": "Mark the articles below as read?"
+  },
+  "extension": {
+    "eye": {
+      "hidden": "Hidden categories — click to peek",
+      "revealed": "Hidden categories are visible — click to show only them",
+      "only": "Only hidden categories are shown — click to hide them again"
+    },
+    "pin": {
+      "all": "All categories — click to keep only the pinned ones",
+      "only": "Only pinned categories are shown — click to remove them",
+      "without": "Pinned categories are removed — click to show everything"
+    },
+    "hiddenTag": "Hidden",
+    "hideCategory": "Hide this category",
+    "unhideCategory": "Restore this category",
+    "pinCategory": "Pin this category to the top",
+    "unpinCategory": "Unpin this category",
+    "locked": "Locked: unlock it in the FreshRSS settings",
+    "failed": "The change did not go through",
+    "convergenceFailed": "View saved, but not every feed followed"
   }
 }
